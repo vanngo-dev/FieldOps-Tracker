@@ -36,6 +36,12 @@ The planned product is aligned around the needs of:
 
 Development will proceed by explicit phases. Each phase should have a narrow scope, acceptance criteria, verification steps, and a single-purpose commit. Future application logic, framework initialization, database setup, and authentication work should wait for their assigned phases.
 
+## Project Documents
+
+- [Project Overview](docs/project-overview.md)
+- [Product Requirements](docs/requirements.md)
+- [Domain Model](docs/domain-model.md)
+
 ## Repository Layout
 
 ```text
