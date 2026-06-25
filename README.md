@@ -42,6 +42,29 @@ Development will proceed by explicit phases. Each phase should have a narrow sco
 - [Product Requirements](docs/requirements.md)
 - [Domain Model](docs/domain-model.md)
 
+## Frontend
+
+The React frontend lives in `apps/web`.
+
+```bash
+cd apps/web
+npm install
+npm run dev
+npm test
+npm run build
+```
+
+Use `npm run build:vite` in `apps/web` when a production Vite bundle is needed.
+
+Current placeholder routes:
+
+- `/login`
+- `/dashboard`
+- `/projects`
+- `/timesheets`
+- `/field-reports`
+- `/assets`
+
 ## Repository Layout
 
 ```text
