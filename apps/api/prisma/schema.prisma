@@ -1,0 +1,149 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+// Prisma's SQL Server connector does not support Prisma enum blocks, so
+// role and status fields are stored as strings using the Phase 01 vocabulary.
+// Role values: admin, project_manager, field_user.
+// Status values:
+// - users/employees: active, inactive, on_leave
+// - projects: planned, active, on_hold, completed, cancelled
+// - timesheets/reports: draft, submitted, under_review, approved, rejected, voided, archived
+// - assets: available, assigned, in_maintenance, retired, lost
+
+model User {
+  id                   String        @id @default(cuid())
+  name                 String
+  email                String        @unique
+  role                 String
+  status               String        @default("active")
+  employee             Employee?
+  managedProjects      Project[]     @relation("ProjectManager")
+  submittedTimesheets  Timesheet[]   @relation("TimesheetSubmitter")
+  approvedTimesheets   Timesheet[]   @relation("TimesheetApprover")
+  authoredFieldReports FieldReport[] @relation("FieldReportAuthor")
+  reviewedFieldReports FieldReport[] @relation("FieldReportReviewer")
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  @@map("users")
+}
+
+model Employee {
+  id               String      @id @default(cuid())
+  employeeNumber   String      @unique
+  firstName        String
+  lastName         String
+  jobTitle         String?
+  trade            String?
+  phone            String?
+  email            String?     @unique
+  status           String      @default("active")
+  userId           String?     @unique
+  user             User?       @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  assignedProjects Project[]   @relation("ProjectEmployees")
+  timesheets       Timesheet[]
+  assignedAssets   Asset[]     @relation("EmployeeAssets")
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  @@map("employees")
+}
+
+model Project {
+  id               String        @id @default(cuid())
+  projectCode      String        @unique
+  name             String
+  description      String?
+  clientName       String?
+  siteLocation     String?
+  projectManagerId String
+  projectManager   User          @relation("ProjectManager", fields: [projectManagerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  status           String        @default("planned")
+  plannedStartDate DateTime?
+  plannedEndDate   DateTime?
+  actualStartDate  DateTime?
+  actualEndDate    DateTime?
+  employees        Employee[]    @relation("ProjectEmployees")
+  timesheets       Timesheet[]
+  fieldReports     FieldReport[]
+  assets           Asset[]       @relation("ProjectAssets")
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@map("projects")
+}
+
+model Timesheet {
+  id                String           @id @default(cuid())
+  projectId         String
+  project           Project          @relation(fields: [projectId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employeeId        String
+  employee          Employee         @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  submittedByUserId String
+  submittedBy       User             @relation("TimesheetSubmitter", fields: [submittedByUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  workDate          DateTime
+  regularHours      Decimal          @default(0) @db.Decimal(5, 2)
+  overtimeHours     Decimal          @default(0) @db.Decimal(5, 2)
+  notes             String?
+  status            String           @default("draft")
+  submittedAt       DateTime?
+  approvedAt        DateTime?
+  approvedByUserId  String?
+  approvedBy        User?            @relation("TimesheetApprover", fields: [approvedByUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@index([projectId, workDate])
+  @@index([employeeId, workDate])
+  @@map("timesheets")
+}
+
+model FieldReport {
+  id               String            @id @default(cuid())
+  projectId        String
+  project          Project           @relation(fields: [projectId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  authorUserId     String
+  author           User              @relation("FieldReportAuthor", fields: [authorUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reportDate       DateTime
+  workPerformed    String
+  safetyNotes      String?
+  blockers         String?
+  assetNotes       String?
+  generalNotes     String?
+  status           String            @default("draft")
+  submittedAt      DateTime?
+  reviewedAt       DateTime?
+  reviewedByUserId String?
+  reviewedBy       User?             @relation("FieldReportReviewer", fields: [reviewedByUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([projectId, reportDate])
+  @@map("field_reports")
+}
+
+model Asset {
+  id                 String      @id @default(cuid())
+  assetTag           String      @unique
+  name               String
+  assetType          String
+  serialNumber       String?
+  status             String      @default("available")
+  assignedProjectId  String?
+  assignedProject    Project?    @relation("ProjectAssets", fields: [assignedProjectId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  assignedEmployeeId String?
+  assignedEmployee   Employee?   @relation("EmployeeAssets", fields: [assignedEmployeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  lastServiceDate    DateTime?
+  nextServiceDate    DateTime?
+  notes              String?
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  @@map("assets")
+}
