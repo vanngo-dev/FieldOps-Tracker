@@ -1,36 +1,55 @@
 const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcryptjs");
 
 const prisma = new PrismaClient();
+const seedPassword = process.env.SEED_USER_PASSWORD || "Password123!";
 
 async function main() {
+  const passwordHash = await bcrypt.hash(seedPassword, 12);
+
   const admin = await prisma.user.upsert({
-    where: { email: "admin@fieldops.local" },
-    update: {},
+    where: { email: "admin@example.com" },
+    update: {
+      passwordHash,
+      role: "admin",
+      status: "active",
+    },
     create: {
       name: "FieldOps Admin",
-      email: "admin@fieldops.local",
+      email: "admin@example.com",
+      passwordHash,
       role: "admin",
       status: "active",
     },
   });
 
   const manager = await prisma.user.upsert({
-    where: { email: "pm@fieldops.local" },
-    update: {},
+    where: { email: "manager@example.com" },
+    update: {
+      passwordHash,
+      role: "project_manager",
+      status: "active",
+    },
     create: {
       name: "Project Manager",
-      email: "pm@fieldops.local",
+      email: "manager@example.com",
+      passwordHash,
       role: "project_manager",
       status: "active",
     },
   });
 
   const fieldUser = await prisma.user.upsert({
-    where: { email: "field.user@fieldops.local" },
-    update: {},
+    where: { email: "field@example.com" },
+    update: {
+      passwordHash,
+      role: "field_user",
+      status: "active",
+    },
     create: {
       name: "Field User",
-      email: "field.user@fieldops.local",
+      email: "field@example.com",
+      passwordHash,
       role: "field_user",
       status: "active",
     },
@@ -45,7 +64,7 @@ async function main() {
       lastName: "User",
       jobTitle: "Field Technician",
       trade: "Operations",
-      email: "field.user@fieldops.local",
+      email: "field@example.com",
       status: "active",
       userId: fieldUser.id,
     },
@@ -69,6 +88,7 @@ async function main() {
   });
 
   console.log(`Seeded users ${admin.email}, ${manager.email}, ${fieldUser.email}`);
+  console.log(`Seeded demo password from SEED_USER_PASSWORD or default local password`);
   console.log(`Seeded project ${project.projectCode}`);
 }
 

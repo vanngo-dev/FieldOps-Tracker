@@ -43,6 +43,52 @@ Expected response:
 { "status": "ok" }
 ```
 
+## Authentication
+
+Set a JWT secret before using login or protected routes:
+
+```bash
+JWT_SECRET=replace-with-a-long-random-local-secret
+JWT_EXPIRES_IN=1h
+```
+
+Login endpoint:
+
+```text
+POST /auth/login
+```
+
+Request body:
+
+```json
+{
+  "email": "admin@example.com",
+  "password": "Password123!"
+}
+```
+
+Successful login returns a JWT and the authenticated user profile. Use the token on protected requests:
+
+```text
+Authorization: Bearer <token>
+```
+
+Demo accounts seeded for local development:
+
+- `admin@example.com`
+- `manager@example.com`
+- `field@example.com`
+
+The default local seed password is `Password123!`. Override it with `SEED_USER_PASSWORD` before running the seed command.
+
+Roles:
+
+- `admin`: administrative access.
+- `project_manager`: manager-level access for project oversight workflows.
+- `field_user`: field-level access for assigned operational work.
+
+Routes protected by role middleware allow only the configured role list and return `403` when an authenticated user has the wrong role.
+
 ## SQL Server Configuration
 
 The API uses Prisma with Microsoft SQL Server. Configure `DATABASE_URL` before running Prisma commands that connect to the database.
