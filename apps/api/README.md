@@ -89,6 +89,44 @@ Roles:
 
 Routes protected by role middleware allow only the configured role list and return `403` when an authenticated user has the wrong role.
 
+## Project Endpoints
+
+All project routes require an authenticated request:
+
+```text
+Authorization: Bearer <token>
+```
+
+Endpoints:
+
+- `GET /projects`
+- `GET /projects/:id`
+- `POST /projects`
+- `PUT /projects/:id`
+- `DELETE /projects/:id`
+
+Role permissions:
+
+- `admin`: read, create, update, and delete projects.
+- `project_manager`: read, create, update, and delete projects.
+- `field_user`: read-only access.
+
+Example create request:
+
+```json
+{
+  "projectCode": "FIELD-001",
+  "name": "Sample Field Operations Project",
+  "projectManagerId": "user-manager-id",
+  "clientName": "Internal Operations",
+  "siteLocation": "Local Test Yard",
+  "status": "planned",
+  "plannedStartDate": "2026-01-15"
+}
+```
+
+Create validation requires `projectCode`, `name`, and `projectManagerId`. Optional date fields must be valid ISO date strings or `null`. `status` must be one of `planned`, `active`, `on_hold`, `completed`, or `cancelled`.
+
 ## SQL Server Configuration
 
 The API uses Prisma with Microsoft SQL Server. Configure `DATABASE_URL` before running Prisma commands that connect to the database.

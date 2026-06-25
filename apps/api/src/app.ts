@@ -5,15 +5,20 @@ import { createAuthRouter } from "./auth/routes";
 import { roles } from "./auth/roles";
 import type { AuthUserStore } from "./auth/types";
 import { createPrismaAuthUserStore } from "./db/auth-users";
+import { createPrismaProjectStore } from "./db/projects";
+import { createProjectsRouter } from "./projects/routes";
+import type { ProjectStore } from "./projects/types";
 
 export interface AppOptions {
   authUserStore?: AuthUserStore;
+  projectStore?: ProjectStore;
   includeAuthTestRoutes?: boolean;
 }
 
 export function createApp(options: AppOptions = {}): express.Express {
   const app = express();
   const authUserStore = options.authUserStore ?? createPrismaAuthUserStore();
+  const projectStore = options.projectStore ?? createPrismaProjectStore();
 
   app.use(express.json());
 
@@ -22,6 +27,7 @@ export function createApp(options: AppOptions = {}): express.Express {
   });
 
   app.use("/auth", createAuthRouter(authUserStore));
+  app.use("/projects", createProjectsRouter(projectStore));
 
   if (options.includeAuthTestRoutes) {
     app.get("/__test/protected", authenticateJwt, (request: AuthenticatedRequest, response) => {
