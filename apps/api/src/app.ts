@@ -6,12 +6,16 @@ import { roles } from "./auth/roles";
 import type { AuthUserStore } from "./auth/types";
 import { createPrismaAuthUserStore } from "./db/auth-users";
 import { createPrismaProjectStore } from "./db/projects";
+import { createPrismaTimesheetStore } from "./db/timesheets";
 import { createProjectsRouter } from "./projects/routes";
 import type { ProjectStore } from "./projects/types";
+import { createTimesheetsRouter } from "./timesheets/routes";
+import type { TimesheetStore } from "./timesheets/types";
 
 export interface AppOptions {
   authUserStore?: AuthUserStore;
   projectStore?: ProjectStore;
+  timesheetStore?: TimesheetStore;
   includeAuthTestRoutes?: boolean;
 }
 
@@ -19,6 +23,7 @@ export function createApp(options: AppOptions = {}): express.Express {
   const app = express();
   const authUserStore = options.authUserStore ?? createPrismaAuthUserStore();
   const projectStore = options.projectStore ?? createPrismaProjectStore();
+  const timesheetStore = options.timesheetStore ?? createPrismaTimesheetStore();
 
   app.use(express.json());
 
@@ -28,6 +33,7 @@ export function createApp(options: AppOptions = {}): express.Express {
 
   app.use("/auth", createAuthRouter(authUserStore));
   app.use("/projects", createProjectsRouter(projectStore));
+  app.use("/timesheets", createTimesheetsRouter(timesheetStore));
 
   if (options.includeAuthTestRoutes) {
     app.get("/__test/protected", authenticateJwt, (request: AuthenticatedRequest, response) => {

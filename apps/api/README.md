@@ -127,6 +127,62 @@ Example create request:
 
 Create validation requires `projectCode`, `name`, and `projectManagerId`. Optional date fields must be valid ISO date strings or `null`. `status` must be one of `planned`, `active`, `on_hold`, `completed`, or `cancelled`.
 
+## Timesheet Endpoints
+
+All timesheet routes require an authenticated request:
+
+```text
+Authorization: Bearer <token>
+```
+
+Endpoints:
+
+- `GET /timesheets`
+- `GET /timesheets/:id`
+- `POST /timesheets`
+- `PUT /timesheets/:id`
+- `POST /timesheets/:id/submit`
+- `POST /timesheets/:id/approve`
+- `POST /timesheets/:id/reject`
+
+Role permissions:
+
+- `field_user`: create, edit, view, and submit their own draft timesheets.
+- `project_manager`: view all timesheets and approve or reject submitted timesheets.
+- `admin`: view all timesheets and approve or reject submitted timesheets.
+
+Status workflow:
+
+- `draft` can be edited and submitted by the owning Field User.
+- `submitted` can be approved or rejected by an Admin or Project Manager.
+- `approved` cannot be edited, submitted, approved again, or rejected.
+- `rejected` cannot be approved unless a later phase explicitly adds a return-to-draft flow.
+
+Example create request:
+
+```json
+{
+  "projectId": "project-id",
+  "employeeId": "employee-id",
+  "workDate": "2026-01-15",
+  "regularHours": 8,
+  "overtimeHours": 1,
+  "notes": "Installed conduit and verified materials."
+}
+```
+
+Example flow:
+
+```text
+POST /timesheets
+POST /timesheets/:id/submit
+POST /timesheets/:id/approve
+```
+
+Use `POST /timesheets/:id/reject` instead of approve when a submitted timesheet should be rejected.
+
+Create validation requires `projectId`, `employeeId`, `workDate`, and `regularHours`. Hours must be numbers greater than or equal to 0, and total submitted hours must be greater than 0. `workDate` must be a valid ISO date string.
+
 ## SQL Server Configuration
 
 The API uses Prisma with Microsoft SQL Server. Configure `DATABASE_URL` before running Prisma commands that connect to the database.
