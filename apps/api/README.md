@@ -183,6 +183,42 @@ Use `POST /timesheets/:id/reject` instead of approve when a submitted timesheet 
 
 Create validation requires `projectId`, `employeeId`, `workDate`, and `regularHours`. Hours must be numbers greater than or equal to 0, and total submitted hours must be greater than 0. `workDate` must be a valid ISO date string.
 
+## Field Report Endpoints
+
+All field report routes require an authenticated request:
+
+```text
+Authorization: Bearer <token>
+```
+
+Endpoints:
+
+- `GET /field-reports`
+- `GET /field-reports/:id`
+- `POST /field-reports`
+- `PUT /field-reports/:id`
+
+Role permissions:
+
+- `field_user`: create field reports and view their own reports.
+- `project_manager`: view all reports and update reports.
+- `admin`: view all reports and update reports.
+
+Example create request:
+
+```json
+{
+  "projectId": "project-id",
+  "reportDate": "2026-01-15",
+  "laborCount": 6,
+  "workCompleted": "Completed trench layout and installed marker posts.",
+  "blockers": "Awaiting inspection window.",
+  "equipmentUsedNotes": "Used excavator EX-12 and laser level."
+}
+```
+
+Create validation requires `projectId`, `reportDate`, `laborCount`, and `workCompleted`. `reportDate` must be a valid ISO date string. `laborCount` must be a whole number greater than or equal to 0.
+
 ## SQL Server Configuration
 
 The API uses Prisma with Microsoft SQL Server. Configure `DATABASE_URL` before running Prisma commands that connect to the database.

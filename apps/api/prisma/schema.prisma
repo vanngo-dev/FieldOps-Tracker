@@ -112,6 +112,7 @@ model FieldReport {
   authorUserId     String
   author           User              @relation("FieldReportAuthor", fields: [authorUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   reportDate       DateTime
+  laborCount       Int               @default(0)
   workPerformed    String
   safetyNotes      String?
   blockers         String?

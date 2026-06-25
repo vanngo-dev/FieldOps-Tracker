@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "build": "tsc -p tsconfig.json",
-    "test": "tsc -p tsconfig.test.json && node dist/test/tests/health.test.js && node dist/test/tests/database-config.test.js && node dist/test/tests/auth.test.js && node dist/test/tests/projects.test.js && node dist/test/tests/timesheets.test.js",
+    "test": "tsc -p tsconfig.test.json && node dist/test/tests/health.test.js && node dist/test/tests/database-config.test.js && node dist/test/tests/auth.test.js && node dist/test/tests/projects.test.js && node dist/test/tests/timesheets.test.js && node dist/test/tests/field-reports.test.js",
     "prisma": "prisma",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
