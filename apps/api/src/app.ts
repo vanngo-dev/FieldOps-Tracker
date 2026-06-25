@@ -4,6 +4,9 @@ import { authenticateJwt, type AuthenticatedRequest, requireRoles } from "./auth
 import { createAuthRouter } from "./auth/routes";
 import { roles } from "./auth/roles";
 import type { AuthUserStore } from "./auth/types";
+import { createAssetsRouter } from "./assets/routes";
+import type { AssetStore } from "./assets/types";
+import { createPrismaAssetStore } from "./db/assets";
 import { createPrismaAuthUserStore } from "./db/auth-users";
 import { createPrismaFieldReportStore } from "./db/field-reports";
 import { createPrismaProjectStore } from "./db/projects";
@@ -20,6 +23,7 @@ export interface AppOptions {
   projectStore?: ProjectStore;
   timesheetStore?: TimesheetStore;
   fieldReportStore?: FieldReportStore;
+  assetStore?: AssetStore;
   includeAuthTestRoutes?: boolean;
 }
 
@@ -29,6 +33,7 @@ export function createApp(options: AppOptions = {}): express.Express {
   const projectStore = options.projectStore ?? createPrismaProjectStore();
   const timesheetStore = options.timesheetStore ?? createPrismaTimesheetStore();
   const fieldReportStore = options.fieldReportStore ?? createPrismaFieldReportStore();
+  const assetStore = options.assetStore ?? createPrismaAssetStore();
 
   app.use(express.json());
 
@@ -40,6 +45,7 @@ export function createApp(options: AppOptions = {}): express.Express {
   app.use("/projects", createProjectsRouter(projectStore));
   app.use("/timesheets", createTimesheetsRouter(timesheetStore));
   app.use("/field-reports", createFieldReportsRouter(fieldReportStore));
+  app.use("/assets", createAssetsRouter(assetStore));
 
   if (options.includeAuthTestRoutes) {
     app.get("/__test/protected", authenticateJwt, (request: AuthenticatedRequest, response) => {

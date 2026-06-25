@@ -219,6 +219,56 @@ Example create request:
 
 Create validation requires `projectId`, `reportDate`, `laborCount`, and `workCompleted`. `reportDate` must be a valid ISO date string. `laborCount` must be a whole number greater than or equal to 0.
 
+## Asset Endpoints
+
+All asset routes require an authenticated request:
+
+```text
+Authorization: Bearer <token>
+```
+
+Endpoints:
+
+- `GET /assets`
+- `GET /assets/:id`
+- `POST /assets`
+- `PUT /assets/:id`
+- `POST /assets/:id/assign`
+
+Role permissions:
+
+- `admin`: read, create, update, and assign assets.
+- `project_manager`: read, create, update, and assign assets.
+- `field_user`: read-only access.
+
+Asset statuses:
+
+- `available`
+- `assigned`
+- `maintenance`
+- `retired`
+
+Example create request:
+
+```json
+{
+  "name": "Excavator 12",
+  "assetTag": "EQ-012",
+  "assetType": "equipment",
+  "status": "available"
+}
+```
+
+Example assign request:
+
+```json
+{
+  "projectId": "project-id"
+}
+```
+
+Create validation requires `name`, `assetTag`, and `status`. `status` must be one of `available`, `assigned`, `maintenance`, or `retired`. Assigning an asset requires a valid `projectId`; missing projects return `404` with `Assigned project not found`.
+
 ## SQL Server Configuration
 
 The API uses Prisma with Microsoft SQL Server. Configure `DATABASE_URL` before running Prisma commands that connect to the database.
