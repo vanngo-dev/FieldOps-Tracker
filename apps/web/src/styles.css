@@ -65,6 +65,23 @@ a {
   white-space: nowrap;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.text-button {
+  min-height: 36px;
+  padding: 0 12px;
+  color: #1f2933;
+  background: #f8e7a5;
+  border: 1px solid #edc94b;
+  border-radius: 6px;
+  font: inherit;
+  cursor: pointer;
+}
+
 .workspace {
   flex: 1;
   display: grid;
@@ -125,6 +142,52 @@ a {
   line-height: 1.6;
 }
 
+.login-form {
+  width: min(100%, 420px);
+  display: grid;
+  gap: 14px;
+}
+
+.login-form label {
+  display: grid;
+  gap: 6px;
+  color: #354853;
+  font-weight: 700;
+}
+
+.login-form input {
+  min-height: 42px;
+  padding: 0 10px;
+  color: #1f2933;
+  background: #ffffff;
+  border: 1px solid #b8c7cf;
+  border-radius: 6px;
+  font: inherit;
+}
+
+.login-form button {
+  min-height: 42px;
+  padding: 0 14px;
+  color: #f8fafb;
+  background: #1f2933;
+  border: 1px solid #1f2933;
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.login-form button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.form-error {
+  margin: 0;
+  color: #9b1c1c;
+  font-weight: 700;
+}
+
 @media (max-width: 720px) {
   .app-header {
     align-items: flex-start;
@@ -134,6 +197,11 @@ a {
 
   .header-meta {
     white-space: normal;
+  }
+
+  .header-actions {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .workspace {

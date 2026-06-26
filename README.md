@@ -56,6 +56,20 @@ npm run build
 
 Use `npm run build:vite` in `apps/web` when a production Vite bundle is needed.
 
+Set the backend API base URL for frontend auth calls:
+
+```bash
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+Demo login accounts use the API seed users:
+
+- `admin@example.com`
+- `manager@example.com`
+- `field@example.com`
+
+Default local password: `Password123!`.
+
 Current placeholder routes:
 
 - `/login`

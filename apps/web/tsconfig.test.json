@@ -11,5 +11,6 @@
     "outDir": "dist-test",
     "rootDir": "."
   },
-  "include": ["src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"]
+  "include": ["src/**/*.tsx", "src/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx"],
+  "exclude": ["src/main.tsx"]
 }
