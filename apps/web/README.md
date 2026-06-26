@@ -38,11 +38,14 @@ For a production Vite bundle, run:
 npm run build:vite
 ```
 
-## Placeholder Routes
+## Current Routes
 
 - `/login`
 - `/dashboard`
 - `/projects`
+- `/projects/new`
+- `/projects/:id`
+- `/projects/:id/edit`
 - `/timesheets`
 - `/field-reports`
 - `/assets`
@@ -69,4 +72,22 @@ Role-aware navigation:
 
 - `admin`: Dashboard, Projects, Timesheets, Field Reports, Assets.
 - `project_manager`: Dashboard, Projects, Timesheets, Field Reports, Assets.
-- `field_user`: Dashboard, Timesheets, Field Reports.
+- `field_user`: Dashboard, Projects, Timesheets, Field Reports.
+
+## Projects UI
+
+The Projects screens require an authenticated session and use the stored JWT in the `Authorization: Bearer <token>` header when calling the backend Projects API.
+
+Implemented project screens:
+
+- `/projects`: list projects with loading, empty, and API error states.
+- `/projects/:id`: view project details.
+- `/projects/new`: create a project.
+- `/projects/:id/edit`: edit a project.
+
+Role behavior:
+
+- Admin and Project Manager users can view, create, and edit projects.
+- Field User accounts can view the projects list and project details only.
+
+Create and edit forms validate required `projectCode`, `name`, and `projectManagerId` fields before submitting to the API. Run `npm test` from `apps/web` to verify the Projects UI rendering, role behavior, and form validation checks.

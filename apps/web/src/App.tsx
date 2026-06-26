@@ -7,7 +7,7 @@ import { AssetsPage } from "./pages/AssetsPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { FieldReportsPage } from "./pages/FieldReportsPage";
 import { LoginPage } from "./pages/LoginPage";
-import { ProjectsPage } from "./pages/ProjectsPage";
+import { ProjectCreatePage, ProjectDetailPage, ProjectEditPage, ProjectsPage } from "./pages/ProjectsPage";
 import { TimesheetsPage } from "./pages/TimesheetsPage";
 
 interface NavigationItem {
@@ -18,7 +18,7 @@ interface NavigationItem {
 
 export const navigationItems: readonly NavigationItem[] = [
   { label: "Dashboard", path: "/dashboard", roles: ["admin", "project_manager", "field_user"] },
-  { label: "Projects", path: "/projects", roles: ["admin", "project_manager"] },
+  { label: "Projects", path: "/projects", roles: ["admin", "project_manager", "field_user"] },
   { label: "Timesheets", path: "/timesheets", roles: ["admin", "project_manager", "field_user"] },
   { label: "Field Reports", path: "/field-reports", roles: ["admin", "project_manager", "field_user"] },
   { label: "Assets", path: "/assets", roles: ["admin", "project_manager"] },
@@ -39,6 +39,9 @@ export function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
       <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
+      <Route path="/projects/new" element={<ProtectedRoute><ProjectCreatePage /></ProtectedRoute>} />
+      <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetailPage /></ProtectedRoute>} />
+      <Route path="/projects/:id/edit" element={<ProtectedRoute><ProjectEditPage /></ProtectedRoute>} />
       <Route path="/timesheets" element={<ProtectedRoute><TimesheetsPage /></ProtectedRoute>} />
       <Route path="/field-reports" element={<ProtectedRoute><FieldReportsPage /></ProtectedRoute>} />
       <Route path="/assets" element={<ProtectedRoute><AssetsPage /></ProtectedRoute>} />
