@@ -6,10 +6,18 @@ import { createAuthController } from "../src/auth/AuthContext";
 import type { AuthApiClient } from "../src/api/authClient";
 import { App, getNavigationForRole, navigationItems } from "../src/App";
 import type { ProjectRecord } from "../src/api/projectsClient";
+import type { TimesheetRecord } from "../src/api/timesheetsClient";
 import { createMemoryAuthStorage } from "../src/auth/storage";
 import type { AuthSession } from "../src/auth/types";
 import { canManageProjects, ProjectListView } from "../src/pages/ProjectsPage";
+import {
+  canCreateTimesheets,
+  canReviewTimesheets,
+  TimesheetListView,
+  timesheetStatuses,
+} from "../src/pages/TimesheetsPage";
 import { defaultProjectFormValues, validateProjectForm } from "../src/projects/projectForm";
+import { defaultTimesheetFormValues, validateTimesheetForm } from "../src/timesheets/timesheetForm";
 
 const originalConsoleError = console.error;
 
@@ -68,6 +76,30 @@ const sampleProject: ProjectRecord = {
   updatedAt: "2026-06-10T00:00:00.000Z",
 };
 
+const draftTimesheet: TimesheetRecord = {
+  id: "timesheet-draft",
+  projectId: "project-1",
+  employeeId: "employee-field",
+  submittedByUserId: "user-field",
+  workDate: "2026-06-18T00:00:00.000Z",
+  regularHours: 8,
+  overtimeHours: 0,
+  notes: "Foundation layout.",
+  status: "draft",
+  submittedAt: null,
+  approvedAt: null,
+  approvedByUserId: null,
+  createdAt: "2026-06-18T01:00:00.000Z",
+  updatedAt: "2026-06-18T01:00:00.000Z",
+};
+
+const submittedTimesheet: TimesheetRecord = {
+  ...draftTimesheet,
+  id: "timesheet-submitted",
+  status: "submitted",
+  submittedAt: "2026-06-18T20:00:00.000Z",
+};
+
 function renderPath(path: string, session: AuthSession | null = adminSession): string {
   return renderToString(
     <MemoryRouter initialEntries={[path]}>
@@ -75,6 +107,8 @@ function renderPath(path: string, session: AuthSession | null = adminSession): s
     </MemoryRouter>,
   );
 }
+
+const noopTimesheetAction = () => undefined;
 
 function renderProjectList(canManage: boolean, options: Partial<Parameters<typeof ProjectListView>[0]> = {}): string {
   return renderToString(
@@ -84,6 +118,29 @@ function renderProjectList(canManage: boolean, options: Partial<Parameters<typeo
         error={null}
         isLoading={false}
         projects={[sampleProject]}
+        {...options}
+      />
+    </MemoryRouter>,
+  );
+}
+
+function renderTimesheetList(
+  role: "admin" | "project_manager" | "field_user",
+  options: Partial<Parameters<typeof TimesheetListView>[0]> = {},
+): string {
+  return renderToString(
+    <MemoryRouter>
+      <TimesheetListView
+        actionError={null}
+        currentUserId={role === "field_user" ? "user-field" : "user-manager"}
+        error={null}
+        isActionPending={false}
+        isLoading={false}
+        onApproveTimesheet={noopTimesheetAction}
+        onRejectTimesheet={noopTimesheetAction}
+        onSubmitTimesheet={noopTimesheetAction}
+        role={role}
+        timesheets={[draftTimesheet, submittedTimesheet]}
         {...options}
       />
     </MemoryRouter>,
@@ -171,6 +228,73 @@ const validProjectErrors = validateProjectForm({
 });
 
 assert.deepEqual(validProjectErrors, {});
+
+const timesheetsMarkup = renderTimesheetList("field_user");
+
+assert.match(timesheetsMarkup, /Timesheets/);
+assert.match(timesheetsMarkup, /timesheet-draft/);
+assert.match(timesheetsMarkup, /8.00 total/);
+
+const timesheetsLoadingMarkup = renderTimesheetList("field_user", { isLoading: true, timesheets: [] });
+
+assert.match(timesheetsLoadingMarkup, /Loading timesheets/);
+
+const timesheetsErrorMarkup = renderTimesheetList("field_user", {
+  error: "Unable to load timesheets.",
+  timesheets: [],
+});
+
+assert.match(timesheetsErrorMarkup, /Unable to load timesheets/);
+
+assert.equal(canCreateTimesheets("field_user"), true);
+assert.equal(canCreateTimesheets("admin"), false);
+assert.equal(canReviewTimesheets("admin"), true);
+assert.equal(canReviewTimesheets("project_manager"), true);
+assert.equal(canReviewTimesheets("field_user"), false);
+
+assert.match(timesheetsMarkup, /Create timesheet/);
+assert.match(timesheetsMarkup, /Submit/);
+assert.doesNotMatch(timesheetsMarkup, /Approve/);
+assert.doesNotMatch(timesheetsMarkup, /Reject/);
+
+const managerTimesheetsMarkup = renderTimesheetList("project_manager");
+const adminTimesheetsMarkup = renderTimesheetList("admin");
+
+assert.match(managerTimesheetsMarkup, /Approve/);
+assert.match(managerTimesheetsMarkup, /Reject/);
+assert.match(adminTimesheetsMarkup, /Approve/);
+assert.match(adminTimesheetsMarkup, /Reject/);
+
+const statusBadgeMarkup = renderTimesheetList("admin", {
+  timesheets: timesheetStatuses.map((status) => ({
+    ...draftTimesheet,
+    id: `timesheet-${status}`,
+    status,
+    submittedAt: status === "draft" ? null : "2026-06-18T20:00:00.000Z",
+  })),
+});
+
+assert.match(statusBadgeMarkup, /Draft/);
+assert.match(statusBadgeMarkup, /Submitted/);
+assert.match(statusBadgeMarkup, /Approved/);
+assert.match(statusBadgeMarkup, /Rejected/);
+
+const invalidTimesheetErrors = validateTimesheetForm(defaultTimesheetFormValues);
+
+assert.equal(invalidTimesheetErrors.projectId, "Project ID is required.");
+assert.equal(invalidTimesheetErrors.employeeId, "Employee ID is required.");
+assert.equal(invalidTimesheetErrors.workDate, "Work date is required.");
+assert.equal(invalidTimesheetErrors.regularHours, "Regular hours are required.");
+
+const validTimesheetErrors = validateTimesheetForm({
+  ...defaultTimesheetFormValues,
+  projectId: "project-1",
+  employeeId: "employee-field",
+  workDate: "2026-06-18",
+  regularHours: "8",
+});
+
+assert.deepEqual(validTimesheetErrors, {});
 
 async function testAuthController(): Promise<void> {
   const successfulLoginSession: AuthSession = {

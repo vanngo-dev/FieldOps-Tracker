@@ -343,6 +343,30 @@ a {
   border-color: #afc7df;
 }
 
+.status-draft {
+  color: #354853;
+  background: #eef3f5;
+  border-color: #d8e0e4;
+}
+
+.status-submitted {
+  color: #4f3600;
+  background: #fff4d8;
+  border-color: #edc94b;
+}
+
+.status-approved {
+  color: #124737;
+  background: #dff5ec;
+  border-color: #9ed6bf;
+}
+
+.status-rejected {
+  color: #7f1d1d;
+  background: #fff1f0;
+  border-color: #f0b4ad;
+}
+
 .status-cancelled {
   color: #7f1d1d;
   background: #fff1f0;
@@ -423,6 +447,39 @@ a {
   color: #9b1c1c;
   font-size: 13px;
   font-weight: 700;
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.inline-action {
+  min-height: 32px;
+  padding: 0 10px;
+  color: #1f2933;
+  background: #ffffff;
+  border: 1px solid #9fb1bb;
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.inline-action:hover {
+  background: #eef3f5;
+}
+
+.inline-action:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.danger-action {
+  color: #7f1d1d;
+  border-color: #e39c96;
 }
 
 @media (max-width: 720px) {

@@ -8,7 +8,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { FieldReportsPage } from "./pages/FieldReportsPage";
 import { LoginPage } from "./pages/LoginPage";
 import { ProjectCreatePage, ProjectDetailPage, ProjectEditPage, ProjectsPage } from "./pages/ProjectsPage";
-import { TimesheetsPage } from "./pages/TimesheetsPage";
+import { TimesheetCreatePage, TimesheetEditPage, TimesheetsPage } from "./pages/TimesheetsPage";
 
 interface NavigationItem {
   label: string;
@@ -43,6 +43,8 @@ export function AppRoutes() {
       <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetailPage /></ProtectedRoute>} />
       <Route path="/projects/:id/edit" element={<ProtectedRoute><ProjectEditPage /></ProtectedRoute>} />
       <Route path="/timesheets" element={<ProtectedRoute><TimesheetsPage /></ProtectedRoute>} />
+      <Route path="/timesheets/new" element={<ProtectedRoute><TimesheetCreatePage /></ProtectedRoute>} />
+      <Route path="/timesheets/:id/edit" element={<ProtectedRoute><TimesheetEditPage /></ProtectedRoute>} />
       <Route path="/field-reports" element={<ProtectedRoute><FieldReportsPage /></ProtectedRoute>} />
       <Route path="/assets" element={<ProtectedRoute><AssetsPage /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
